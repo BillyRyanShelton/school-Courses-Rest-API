@@ -3,7 +3,7 @@
 // load modules
 const express = require('express');
 const morgan = require('morgan');
-const Sequelize = require('sequelize');
+const sequelize = require('./models').sequelize;
 
 
 // variable to enable global error logging
@@ -50,3 +50,7 @@ app.set('port', process.env.PORT || 5000);
 const server = app.listen(app.get('port'), () => {
   console.log(`Express server is listening on port ${server.address().port}`);
 });
+
+
+
+sequelize.authenticate();
