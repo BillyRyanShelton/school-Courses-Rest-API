@@ -6,13 +6,30 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true
     },
-    firstname: DataTypes.STRING,
-    lastname: DataTypes.STRING,
-    emailAddress: DataTypes.STRING,
-    password: DataTypes.STRING
+    firstName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    lastName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    emailAddress: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    }
   }, {});
   User.associate = function(models) {
-    // associations can be defined here
+    User.hasMany(models.Course, { 
+      foreignKey:{
+        fieldName:'userId',
+        allowNull: false,
+      },
+    });
   };
   return User;
 };
