@@ -1,5 +1,5 @@
 {
-  "name": "fullstackjs-rest-api",
+  "name": "techdegree-fullstackjs-rest-api",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
@@ -19,7 +19,6 @@
     "express": "^4.16.3",
     "morgan": "^1.9.0",
     "promise.prototype.finally": "^3.1.0",
-    "sequelize": "^5.8.5",
     "sqlite3": "^4.0.2"
   }
 }

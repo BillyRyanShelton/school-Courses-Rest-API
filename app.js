@@ -3,24 +3,9 @@
 // load modules
 const express = require('express');
 const morgan = require('morgan');
-const Sequelize = require('sequelize');
-// const db = new Sequelize('')
 
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
-
-//an instance of sequlize is configured to the sqlite db file
-const db = new Sequelize('sqlite:fsjstd-restapi.db');
-
-//connection to database is verified via the console
-db.authenticate()
-  .then(function(err) {
-    console.log('Connection has been established successfully.');
-  })
-  .catch(function (err) {
-    console.log('Unable to connect to the database:', err);
-  });
-
 
 // create the Express app
 const app = express();
@@ -33,7 +18,7 @@ app.use(morgan('dev'));
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
   res.json({
-    message: "Welcome to Shelton's Public High School REST API!",
+    message: 'Welcome to the REST API project!',
   });
 });
 
