@@ -8,9 +8,6 @@ var sequelize = require("../models").sequelize;
 
 
 
-// Route that creates a new user.
-router.post('/users', (req, res) => {
 
-});
 
 module.exports = router;
