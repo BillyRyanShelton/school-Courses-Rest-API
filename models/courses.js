@@ -1,6 +1,6 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  const Course = sequelize.define('Course', {
+  const Courses = sequelize.define('Courses', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -17,13 +17,13 @@ module.exports = (sequelize, DataTypes) => {
     estimatedTime: DataTypes.STRING,
     materialsNeeded: DataTypes.STRING
   }, {});
-  Course.associate = function(models) {
-    Course.belongsTo(models.User, { 
+  Courses.associate = function(models) {
+    Courses.belongsTo(models.Users, { 
       foreignKey:{
         fieldName:'userId',
         allowNull: false,
       },
     });
   };
-  return Course;
+  return Courses;
 };
