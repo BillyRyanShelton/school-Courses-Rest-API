@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 
 // Add routes.
 app.use('/api', users);
-app.use('/api', courses);
+// app.use('/api', courses);
 
 // send 404 if no other route matched
 app.use((req, res) => {
@@ -39,9 +39,9 @@ app.use((req, res) => {
 
 // setup a global error handler
 app.use((err, req, res, next) => {
-  if (enableGlobalErrorLogging) {
+  // if (enableGlobalErrorLogging) {
     console.error(`Global error handler: ${JSON.stringify(err.stack)}`);
-  }
+  // }
 
   res.status(err.status || 500).json({
     message: err.message,
@@ -56,5 +56,3 @@ app.set('port', process.env.PORT || 5000);
 const server = app.listen(app.get('port'), () => {
   console.log(`Express server is listening on port ${server.address().port}`);
 });
-
-

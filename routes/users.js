@@ -25,13 +25,65 @@ const getCredentials = (req) => {
     const partsCredentials = stringCredentials.split(':');
     //the credentials are set
     credentials = {
-      name: partsCredentials[0],
+      email: partsCredentials[0],
       pass: partsCredentials[1],
     };
   }
 
   return credentials;
 };
+
+
+// Route that returns the current authenticated user.
+router.get('/users', (req, res) => {
+  
+    let message = null;
+
+    //user credentials are acquired from auth header
+    const credentials = getCredentials(req);
+
+  if (credentials) {
+    //the email address is searched in the database
+    Users.findAll({
+        where: {
+            emailAddress: credentials.email
+        }
+    }).then((user)=>{
+        const authenticated = bcryptjs
+        .compareSync(credentials.pass, user[0].password);
+        console.log(credentials.pass);
+        console.log(user[0].password);
+        console.log(user[0].id);
+        console.log(user[0].lastName);
+        console.log(user[0].firstName);
+        console.log(user[0].emailAddress);
+        console.log(authenticated);
+        if (authenticated) {
+            console.log(`Authentication successful for username: ${user[0].username}`);
+            // Store the user on the Request object.
+            //let user =[user[0].id, user[1].firstName, user[2].lastName, user[3].lastName, user[4].emailAddress];
+             res.json({
+                firstName: user[0].firstName,
+                lastName: user[0].lastName,
+                emailAddress: user[0].emailAddress,
+                id: user[0].id,
+            });
+        } else {
+        message = `Authentication failure for username: ${user[0].username}`;
+        }
+    });
+
+  }else {
+    message = 'Auth header not found';
+  }
+
+  if (message) {
+    console.warn(message);
+    res.status(401).json({ message: 'Access Denied' });
+  }// } else {
+  //   next();
+  // }
+});
 
 
 // Route that creates a new user.
@@ -42,6 +94,8 @@ router.post('/users', (req, res) => {
         lastName: newUser.lastName,
         emailAddress: newUser.emailAddress,
         password: newUser.password
-    }).save()});
+    }).save()
+});
+
 
 module.exports = router;
