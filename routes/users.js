@@ -87,14 +87,42 @@ router.get('/users', (req, res) => {
 
 
 // Route that creates a new user.
-router.post('/users', (req, res) => {
+router.post('/users', [
+  check('firstName')
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a value for "first name"'),
+  check('lastName')
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a value for "last name"'),
+  check('emailAddress')
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a value for "email address"'),
+  check('password')
+    .exists({ checkNull: true, checkFalsy: true })
+    .withMessage('Please provide a value for "password"'),
+],(req, res) => {
+     // Attempt to get the validation result from the Request object.
+    const errors = validationResult(req);    
+
+    //if validation errors
+    if (!errors.isEmpty()) {
+    // Use the Array `map()` method to get a list of error messages.
+    const errorMessages = errors.array().map(error => error.msg);
+
+    // Return the validation errors to the client.
+    return res.status(400).json({ errors: errorMessages });
+  }
     let newUser = req.body;
+    // Hash the new user's password.
+    newUser.password = bcryptjs.hashSync(newUser.password);
     Users.build({
         firstName: newUser.firstName,
         lastName: newUser.lastName,
         emailAddress: newUser.emailAddress,
         password: newUser.password
     }).save()
+
+    res.redirect('/');
 });
 
 
