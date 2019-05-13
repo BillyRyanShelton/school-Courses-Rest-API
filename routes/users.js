@@ -121,7 +121,6 @@ router.post('/users', [
         emailAddress: newUser.emailAddress,
         password: newUser.password
     }).save()
-
     res.redirect('/');
 });
 
