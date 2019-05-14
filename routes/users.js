@@ -51,13 +51,13 @@ router.get('/users', (req, res) => {
     }).then((user)=>{
         const authenticated = bcryptjs
         .compareSync(credentials.pass, user[0].password);
-        console.log(credentials.pass);
-        console.log(user[0].password);
-        console.log(user[0].id);
-        console.log(user[0].lastName);
-        console.log(user[0].firstName);
-        console.log(user[0].emailAddress);
-        console.log(authenticated);
+        // console.log(credentials.pass);
+        // console.log(user[0].password);
+        // console.log(user[0].id);
+        // console.log(user[0].lastName);
+        // console.log(user[0].firstName);
+        // console.log(user[0].emailAddress);
+        // console.log(authenticated);
         if (authenticated) {
             console.log(`Authentication successful for username: ${user[0].username}`);
             // Store the user on the Request object.
@@ -67,10 +67,16 @@ router.get('/users', (req, res) => {
                 lastName: user[0].lastName,
                 emailAddress: user[0].emailAddress,
                 id: user[0].id,
+                password: credentials.pass,
             });
         } else {
-        message = `Authentication failure for username: ${user[0].username}`;
+        throw message = `Authentication failure for username: ${user[0].username}`;
         }
+    }).catch((err)=>{
+        err = 'There was an error processing your request.';
+        console.warn(err);
+        res.status(401).json({ message: 'Access Denied' });
+
     });
 
   }else {
