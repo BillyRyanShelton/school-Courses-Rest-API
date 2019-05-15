@@ -118,16 +118,40 @@ router.post('/users', [
     // Return the validation errors to the client.
     return res.status(400).json({ errors: errorMessages });
   }
-    let newUser = req.body;
-    // Hash the new user's password.
-    newUser.password = bcryptjs.hashSync(newUser.password);
-    Users.build({
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        emailAddress: newUser.emailAddress,
-        password: newUser.password
-    }).save()
-    res.redirect('/');
+
+  let newUser = req.body;
+
+  Users.findAll({
+        where: {
+            emailAddress: newUser.emailAddress
+        }
+    }).then((user)=>{
+      //if the user info is already in the system
+        if(user[0]) {
+             res.status(401).json({ message: 'User already exists in the system.' });
+        }  //if the user's info is not in the system it is added 
+        else{
+            // Hash the new user's password.
+          newUser.password = bcryptjs.hashSync(newUser.password);
+          Users.build({
+              firstName: newUser.firstName,
+              lastName: newUser.lastName,
+              emailAddress: newUser.emailAddress,
+              password: newUser.password
+          }).save()
+          res.redirect(201, '/');
+        }
+    });
+
+  // // Hash the new user's password.
+  // newUser.password = bcryptjs.hashSync(newUser.password);
+  // Users.build({
+  //     firstName: newUser.firstName,
+  //     lastName: newUser.lastName,
+  //     emailAddress: newUser.emailAddress,
+  //     password: newUser.password
+  // }).save()
+  // res.redirect(201, '/');
 });
 
 

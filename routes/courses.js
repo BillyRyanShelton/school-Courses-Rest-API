@@ -17,7 +17,7 @@ router.get('/courses', (req, res) => {
 
 router.get('/courses/:id', (req, res, next) => {
     Courses.findByPk(req.params.id).then((course) => {
-        //if it is found then the book is updated
+        //if it is found then is is returned
         if(course) {
             res.json({
                 course
