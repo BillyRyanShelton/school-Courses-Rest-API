@@ -51,17 +51,9 @@ router.get('/users', (req, res) => {
     }).then((user)=>{
         const authenticated = bcryptjs
         .compareSync(credentials.pass, user[0].password);
-        // console.log(credentials.pass);
-        // console.log(user[0].password);
-        // console.log(user[0].id);
-        // console.log(user[0].lastName);
-        // console.log(user[0].firstName);
-        // console.log(user[0].emailAddress);
-        // console.log(authenticated);
+
         if (authenticated) {
             console.log(`Authentication successful for username: ${user[0].username}`);
-            // Store the user on the Request object.
-            //let user =[user[0].id, user[1].firstName, user[2].lastName, user[3].lastName, user[4].emailAddress];
              res.json({
                 firstName: user[0].firstName,
                 lastName: user[0].lastName,
@@ -86,9 +78,7 @@ router.get('/users', (req, res) => {
   if (message) {
     console.warn(message);
     res.status(401).json({ message: 'Access Denied' });
-  }// } else {
-  //   next();
-  // }
+  }
 });
 
 
@@ -143,15 +133,6 @@ router.post('/users', [
         }
     });
 
-  // // Hash the new user's password.
-  // newUser.password = bcryptjs.hashSync(newUser.password);
-  // Users.build({
-  //     firstName: newUser.firstName,
-  //     lastName: newUser.lastName,
-  //     emailAddress: newUser.emailAddress,
-  //     password: newUser.password
-  // }).save()
-  // res.redirect(201, '/');
 });
 
 
