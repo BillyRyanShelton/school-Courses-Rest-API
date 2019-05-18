@@ -56,6 +56,85 @@ router.get('/courses/:id', (req, res, next) => {
     });
 });
 
+// //posts a new course
+// router.post('/courses', [
+//   check('title')
+//     .exists({ checkNull: true, checkFalsy: true })
+//     .withMessage('Please provide a value for "title".'),
+//   check('description')
+//     .exists({ checkNull: true, checkFalsy: true })
+//     .withMessage('Please provide a value for "description"'),
+// ], (req, res) => {
+//      // Attempt to get the validation result from the Request object.
+//     const courseErrors = validationResult(req);    
+
+//     //if validation errors
+//     if (!courseErrors.isEmpty()) {
+//         // Use the Array `map()` method to get a list of error messages.
+//         const courseErrorMessages = courseErrors.array().map(error => error.msg);
+
+//         // Return the validation errors to the client.
+//         return res.status(400).json({ courseErrors: courseErrorMessages });
+//     }
+
+//     let message = null;
+//     //user credentials are acquired from auth header
+//     const credentials = getCredentials(req);
+//     let newCourse = req.body;
+
+//     if (credentials) {
+//         //validates if user is in database
+//         Users.findAll({
+//             where: {
+//                 emailAddress: credentials.email
+//             }
+//         }).then((user)=>{
+//             const authenticated = bcryptjs
+//             .compareSync(credentials.pass, user[0].password);
+
+//             if (authenticated) {
+//                 Courses.build({
+//                     title: newCourse.title,
+//                     description: newCourse.description,
+//                     estimatedTime: newCourse.estimatedTime,
+//                     materialsNeeded: newCourse.materialsNeeded,
+//                     userId: user[0].id
+//                 }).save()
+//                 .then(() => {
+//                     Courses.findAll({
+//                         where: {
+//                             id: newCourse.title
+//                         }
+//                     }).then((course)=>{
+//                         return res.redirect(201, '/courses/:course.id');
+//                     });
+//                 })
+//             } else {
+//                 throw message = `Authentication failure for username: ${user[0].username}`;
+//             }
+//         }).catch((err)=>{
+//             err = 'There was an error processing your request.';
+//             console.warn(err);
+//             return res.status(401).json({ message: 'Access Denied' });
+//         });
+//     }else {
+//         message = 'Auth header not found';
+//     }
+
+//     if (message) {
+//         console.warn(message);
+//         res.status(401).json({ message: 'Access Denied' });
+//     }
+
+// });
+
+
+
+
+
+
+
+
 //posts a new course
 router.post('/courses', [
   check('title')
@@ -64,70 +143,88 @@ router.post('/courses', [
   check('description')
     .exists({ checkNull: true, checkFalsy: true })
     .withMessage('Please provide a value for "description"'),
-], async (req, res) => {
+], (req, res) => {
      // Attempt to get the validation result from the Request object.
     const courseErrors = validationResult(req);    
 
-    //if validation errors
-    if (!courseErrors.isEmpty()) {
-        // Use the Array `map()` method to get a list of error messages.
-        const courseErrorMessages = courseErrors.array().map(error => error.msg);
-
-        // Return the validation errors to the client.
-        return res.status(400).json({ courseErrors: courseErrorMessages });
-    }
-
-    let message = null;
     //user credentials are acquired from auth header
     const credentials = getCredentials(req);
     let newCourse = req.body;
 
-    if (credentials) {
-        //validates if user is in database
-        Users.findAll({
+
+    const checkTitleAndDescription = new Promise((resolve, reject) => {
+        if(!courseErrors.isEmpty()) {
+            const courseErrorMessages = courseErrors.array().map(error => error.msg);
+            reject(courseErrorMessages);
+        } else {
+            console.log('Title and Description: passed');
+            resolve();
+        }
+    });
+
+    const checkEmailAndPasswordProvided = new Promise((resolve, reject) => {
+        if(credentials.pass && credentials.email) {
+            console.log('Email Address and Password are present: passed');
+            resolve();
+        } else{
+            reject('The Email Address/Password were not provided.');
+        }
+    });
+
+    function checkEmailInDatabase(user) { 
+        return new Promise((resolve, reject) => {
+            if(user == null) {
+                reject('The Email Address was not found.');
+            } else{
+                //validates if user is in database
+                console.log('Email Address is present: passed');
+                resolve(user);
+            }
+        });
+    }
+
+
+    function checkPassword(user){ 
+        return new Promise((resolve, reject) =>{
+            //the user password is compared with the database password
+            const authenticated = bcryptjs.compareSync(credentials.pass, user[0].password);
+            if(authenticated){
+                console.log('Password is a match: passed');
+                resolve(user);
+            } else{
+                reject('The Password is invalid.');
+            }
+        });
+    }
+
+
+
+    checkTitleAndDescription
+    .then(()=>{return checkEmailAndPasswordProvided})
+    .then(()=>{return Users.findAll({
             where: {
                 emailAddress: credentials.email
             }
-        }).then((user)=>{
-            const authenticated = bcryptjs
-            .compareSync(credentials.pass, user[0].password);
-
-            if (authenticated) {
-                Courses.build({
+        });
+    }).then((user)=>{return checkEmailInDatabase(user); })
+    .then((user)=>{return checkPassword(user); })
+    .then((user)=>{ 
+        return Courses.build({
                     title: newCourse.title,
                     description: newCourse.description,
                     estimatedTime: newCourse.estimatedTime,
                     materialsNeeded: newCourse.materialsNeeded,
                     userId: user[0].id
                 }).save()
-                .then(() => {
-                    Courses.findAll({
-                        where: {
-                            id: newCourse.title
-                        }
-                    }).then((course)=>{
-                        return res.redirect(201, '/courses/:course.id');
-                    });
-                })
-            } else {
-                throw message = `Authentication failure for username: ${user[0].username}`;
-            }
-        }).catch((err)=>{
-            err = 'There was an error processing your request.';
-            console.warn(err);
-            return res.status(401).json({ message: 'Access Denied' });
-        });
-    }else {
-        message = 'Auth header not found';
-    }
-
-    if (message) {
-        console.warn(message);
-        res.status(401).json({ message: 'Access Denied' });
-    }
+     }).then((course)=>{ return res.redirect(201, '/courses/:course.id'); })
+    .catch((err)=>{
+        //err = 'There was an error processing your request.';
+        console.warn(err);
+        return res.status(401).json({ message: 'Access Denied' });
+    });
 
 });
-
+    
 
 //updates a user's course
 router.put('/courses/:id', [
@@ -216,77 +313,6 @@ router.put('/courses/:id', [
         console.warn(err);
         return res.status(401).json({ message: 'Access Denied' });
     });
-
-
-    //  // Attempt to get the validation result from the Request object.
-    // const courseErrors = validationResult(req);    
-
-    // //if validation errors
-    // if (!courseErrors.isEmpty()) {
-    //     // Use the Array `map()` method to get a list of error messages.
-    //     const courseErrorMessages = courseErrors.array().map(error => error.msg);
-
-    //     // Return the validation errors to the client.
-    //     return res.status(400).json({ courseErrors: courseErrorMessages });
-    // }
-
-    // let message = null;
-    // //user credentials are acquired from auth header
-    // const credentials = getCredentials(req);
-    // let newCourse = req.body;
-
-    // if (credentials) {
-    //     //validates if user is in database
-    //     Users.findAll({
-    //         where: {
-    //             emailAddress: credentials.email
-    //         }
-    //     }).then((user)=>{
-    //         const authenticated = bcryptjs
-    //         .compareSync(credentials.pass, user[0].password);
-    //         console.log(credentials.pass);
-    //         console.log(user[0].password);
-    //         if (authenticated) {
-    //             Courses.findByPk(req.params.id).then((course) => {
-    //                 console.log(course);
-    //                 if(course != null) {
-    //                     course.update(req.body);
-    //                     return course();
-    //                 } else {
-    //                     throw err();
-    //                 }
-    //             })
-    //             .then((course) => {
-    //                 Courses.findAll({
-    //                     where: {
-    //                         id: newCourse.title
-    //                     }
-    //                 }).catch((err)=>{
-    //                     err = 'There was an error processing your request.';
-    //                     console.warn(err);
-    //                     return res.status(401).json({ message: 'Access Denied' });
-    //                 });
-    //             }).catch((err)=>{
-    //                     err = 'There was an error processing your request.';
-    //                     console.warn(err);
-    //                     return res.status(401).json({ message: 'Access Denied' });
-    //                 });
-    //         } else {
-    //             throw message = `Authentication failure for username: ${user[0].username}`;
-    //         }
-    //     }).catch((err)=>{
-    //         err = 'There was an error processing your request.';
-    //         console.warn(err);
-    //         return res.status(401).json({ message: 'Access Denied' });
-    //     });
-    // }else {
-    //     message = 'Auth header not found';
-    // }
-
-    // if (message) {
-    //     console.warn(message);
-    //     res.status(401).json({ message: 'Access Denied' });
-    // }
 
 });
 
