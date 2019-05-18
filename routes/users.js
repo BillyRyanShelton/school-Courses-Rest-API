@@ -34,52 +34,121 @@ const getCredentials = (req) => {
 };
 
 
-// Route that returns the current authenticated user.
 router.get('/users', (req, res) => {
-  
-    let message = null;
 
-    //user credentials are acquired from auth header
-    const credentials = getCredentials(req);
+  //user credentials are acquired from auth header
+  const credentials = getCredentials(req);
 
-  if (credentials) {
-    //the email address is searched in the database
-    Users.findAll({
-        where: {
-            emailAddress: credentials.email
+  const checkEmailAndPasswordProvided = new Promise((resolve, reject) => {
+        if(credentials.pass && credentials.email) {
+            console.log('Email Address and Password are present: passed');
+            resolve();
+        } else{
+            reject('The Email Address/Password were not provided.');
         }
-    }).then((user)=>{
-        const authenticated = bcryptjs
-        .compareSync(credentials.pass, user[0].password);
+  });
 
-        if (authenticated) {
-            console.log(`Authentication successful for username: ${user[0].username}`);
-             res.json({
+
+  function checkEmailInDatabase(user) { 
+      return new Promise((resolve, reject) => {
+          if(user == null) {
+              reject('The Email Address was not found.');
+          } else{
+              //validates if user is in database
+              console.log('Email Address is present: passed');
+              resolve(user);
+          }
+      });
+  }
+
+
+   function checkPassword(user){ 
+      return new Promise((resolve, reject) =>{
+          //the user password is compared with the database password
+          const authenticated = bcryptjs.compareSync(credentials.pass, user[0].password);
+          if(authenticated){
+              console.log('Password is a match: passed');
+              resolve(user);
+          } else{
+              reject('The Password is invalid.');
+          }
+      });
+  }
+
+
+
+  checkEmailAndPasswordProvided
+  .then(()=>{return Users.findAll({
+          where: {
+              emailAddress: credentials.email
+          }
+      });
+  }).then((user)=>{return checkEmailInDatabase(user); })
+  .then((user)=>{return checkPassword(user); })
+  .then((user)=>{
+    res.json({
                 firstName: user[0].firstName,
                 lastName: user[0].lastName,
                 emailAddress: user[0].emailAddress,
                 id: user[0].id,
                 password: credentials.pass,
             });
-        } else {
-        throw message = `Authentication failure for username: ${user[0].username}`;
-        }
-    }).catch((err)=>{
-        err = 'There was an error processing your request.';
-        console.warn(err);
-        res.status(401).json({ message: 'Access Denied' });
+  })
+  .catch((err)=>{
+      //err = 'There was an error processing your request.';
+      console.warn(err);
+      return res.status(401).json({ message: 'Access Denied' });
+  });
 
-    });
 
-  }else {
-    message = 'Auth header not found';
-  }
-
-  if (message) {
-    console.warn(message);
-    res.status(401).json({ message: 'Access Denied' });
-  }
 });
+
+// // Route that returns the current authenticated user.
+// router.get('/users', (req, res) => {
+  
+//     let message = null;
+
+//     //user credentials are acquired from auth header
+//     const credentials = getCredentials(req);
+
+//   if (credentials) {
+//     //the email address is searched in the database
+//     Users.findAll({
+//         where: {
+//             emailAddress: credentials.email
+//         }
+//     }).then((user)=>{
+//         const authenticated = bcryptjs
+//         .compareSync(credentials.pass, user[0].password);
+
+//         if (authenticated) {
+//             console.log(`Authentication successful for username: ${user[0].username}`);
+//              res.json({
+//                 firstName: user[0].firstName,
+//                 lastName: user[0].lastName,
+//                 emailAddress: user[0].emailAddress,
+//                 id: user[0].id,
+//                 password: credentials.pass,
+//             });
+//         } else {
+//         throw message = `Authentication failure for username: ${user[0].username}`;
+//         }
+//     }).catch((err)=>{
+//         err = 'There was an error processing your request.';
+//         console.warn(err);
+//         res.status(401).json({ message: 'Access Denied' });
+
+//     });
+
+//   }else {
+//     message = 'Auth header not found';
+//   }
+
+//   if (message) {
+//     console.warn(message);
+//     res.status(401).json({ message: 'Access Denied' });
+//   }
+// });
 
 
 // Route that creates a new user.
