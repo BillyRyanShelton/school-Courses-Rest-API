@@ -147,6 +147,9 @@ router.put('/courses/:id', [
     const credentials = getCredentials(req);
     let newCourse = req.body;
 
+
+
+
     const checkTitleAndDescription = new Promise((resolve, reject) => {
         if(!courseErrors.isEmpty()) {
             const courseErrorMessages = courseErrors.array().map(error => error.msg);
@@ -157,9 +160,8 @@ router.put('/courses/:id', [
         }
     });    
 
-    const checkEmailAndPasswordPresent = new Promise((resolve, reject) => {
+    const checkEmailAndPasswordProvided = new Promise((resolve, reject) => {
         if(credentials.pass && credentials.email) {
-            //validates if user is in database
             console.log('Email Address and Password are present: passed');
             resolve();
         } else{
@@ -167,8 +169,48 @@ router.put('/courses/:id', [
         }
     });
 
+    function checkEmailInDatabase(user) { 
+        return new Promise((resolve, reject) => {
+            if(user == null) {
+                reject('The Email Address was not found.');
+            } else{
+                //validates if user is in database
+                console.log('Email Address is present: passed');
+                resolve(user);
+            }
+        });
+    }
+
+
+     function checkPassword(user){ 
+        return new Promise((resolve, reject) =>{
+            //the user password is compared with the database password
+            const authenticated = bcryptjs.compareSync(credentials.pass, user[0].password);
+            if(authenticated){
+                console.log('Password is a match: passed');
+                resolve();
+            } else{
+                reject('The Password is invalid.');
+            }
+        });
+    }
+
+
+
     checkTitleAndDescription
-    .then(()=>{return checkEmailAndPasswordPresent})
+    .then(()=>{return checkEmailAndPasswordProvided})
+    .then(()=>{return Users.findAll({
+            where: {
+                emailAddress: credentials.email
+            }
+        });
+    }).then((user)=>{return checkEmailInDatabase(user); })
+    .then((user)=>{return checkPassword(user); })
+    .then(()=>{return Courses.findByPk(req.params.id);  })
+    .then((course)=>{ 
+        course.update(req.body);
+        return res.status(204).json({ message: '' });
+     })
     .catch((err)=>{
         //err = 'There was an error processing your request.';
         console.warn(err);
