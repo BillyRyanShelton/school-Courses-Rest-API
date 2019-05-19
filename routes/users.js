@@ -33,7 +33,7 @@ const getCredentials = (req) => {
   return credentials;
 };
 
-
+//returns the currently authenticated user
 router.get('/users', (req, res) => {
 
   //user credentials are acquired from auth header
@@ -151,6 +151,61 @@ router.get('/users', (req, res) => {
 // });
 
 
+// // Route that creates a new user.
+// router.post('/users', [
+//   check('firstName')
+//     .exists({ checkNull: true, checkFalsy: true })
+//     .withMessage('Please provide a value for "first name"'),
+//   check('lastName')
+//     .exists({ checkNull: true, checkFalsy: true })
+//     .withMessage('Please provide a value for "last name"'),
+//   check('emailAddress')
+//     .exists({ checkNull: true, checkFalsy: true })
+//     .withMessage('Please provide a value for "email address"'),
+//   check('password')
+//     .exists({ checkNull: true, checkFalsy: true })
+//     .withMessage('Please provide a value for "password"'),
+// ],(req, res) => {
+//      // Attempt to get the validation result from the Request object.
+//     const errors = validationResult(req);    
+
+//     //if validation errors
+//     if (!errors.isEmpty()) {
+//     // Use the Array `map()` method to get a list of error messages.
+//     const errorMessages = errors.array().map(error => error.msg);
+
+//     // Return the validation errors to the client.
+//     return res.status(400).json({ errors: errorMessages });
+//   }
+
+//   let newUser = req.body;
+
+//   Users.findAll({
+//         where: {
+//             emailAddress: newUser.emailAddress
+//         }
+//     }).then((user)=>{
+//       //if the user info is already in the system
+//         if(user[0]) {
+//              res.status(401).json({ message: 'User already exists in the system.' });
+//         }  //if the user's info is not in the system it is added 
+//         else{
+//             // Hash the new user's password.
+//           newUser.password = bcryptjs.hashSync(newUser.password);
+//           Users.build({
+//               firstName: newUser.firstName,
+//               lastName: newUser.lastName,
+//               emailAddress: newUser.emailAddress,
+//               password: newUser.password
+//           }).save()
+//           res.redirect(201, '/');
+//         }
+//     });
+
+// });
+
+
+
 // Route that creates a new user.
 router.post('/users', [
   check('firstName')
@@ -166,43 +221,58 @@ router.post('/users', [
     .exists({ checkNull: true, checkFalsy: true })
     .withMessage('Please provide a value for "password"'),
 ],(req, res) => {
-     // Attempt to get the validation result from the Request object.
-    const errors = validationResult(req);    
+  // Attempt to get the validation result from the Request object.
+  const userErrors = validationResult(req);    
 
-    //if validation errors
-    if (!errors.isEmpty()) {
-    // Use the Array `map()` method to get a list of error messages.
-    const errorMessages = errors.array().map(error => error.msg);
+  //user credentials are acquired from auth header
+  const credentials = getCredentials(req);
 
-    // Return the validation errors to the client.
-    return res.status(400).json({ errors: errorMessages });
+  const checkFirstLastEmailAndPassword = new Promise((resolve, reject) => {
+      if(!userErrors.isEmpty()) {
+          const userErrorMessages = userErrors.array().map(error => error.msg);
+          reject(userErrorMessages);
+      } else {
+          console.log('First Name, Last Name, Email, Password Present: passed');
+          resolve();
+      }
+  });   
+
+  function checkIfUserIsInSystem(user){ 
+    return new Promise((resolve, reject) =>{
+      let newUser = req.body;
+      if(user[0]) {
+        reject('User already exists in the system.');
+           // res.status(401).json({ message: 'User already exists in the system.' });
+      }  //if the user's info is not in the system it is added 
+      else{
+        // Hash the new user's password.
+        newUser.password = bcryptjs.hashSync(newUser.password);
+        Users.build({
+            firstName: newUser.firstName,
+            lastName: newUser.lastName,
+            emailAddress: newUser.emailAddress,
+            password: newUser.password
+        }).save()
+        res.redirect(201, '/');
+        resolve();
+      }
+    });
   }
 
-  let newUser = req.body;
-
-  Users.findAll({
+    checkFirstLastEmailAndPassword
+    .then(()=>{return Users.findAll({
         where: {
-            emailAddress: newUser.emailAddress
+            emailAddress: req.body.emailAddress
         }
-    }).then((user)=>{
-      //if the user info is already in the system
-        if(user[0]) {
-             res.status(401).json({ message: 'User already exists in the system.' });
-        }  //if the user's info is not in the system it is added 
-        else{
-            // Hash the new user's password.
-          newUser.password = bcryptjs.hashSync(newUser.password);
-          Users.build({
-              firstName: newUser.firstName,
-              lastName: newUser.lastName,
-              emailAddress: newUser.emailAddress,
-              password: newUser.password
-          }).save()
-          res.redirect(201, '/');
-        }
+      })
+    })
+    .then((user)=>{ return checkIfUserIsInSystem(user)})
+    .catch((err)=>{
+        //err = 'There was an error processing your request.';
+        console.warn(err);
+        return res.status(401).json({ message: 'Access Denied' });
     });
 
 });
-
 
 module.exports = router;
