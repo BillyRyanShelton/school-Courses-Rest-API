@@ -239,4 +239,94 @@ router.put('/courses/:id', [
 
 });
 
+
+
+
+router.delete('/courses/:id', (req, res) => {
+
+    //user credentials are acquired from auth header
+    const credentials = getCredentials(req);
+
+    const checkEmailAndPasswordProvided = new Promise((resolve, reject) => {
+        if(credentials.pass && credentials.email) {
+            console.log('Email Address and Password are present: passed');
+            resolve();
+        } else{
+            reject('Email Address and Password are present: failed.');
+        }
+    });
+
+    function checkEmailInDatabase(user) { 
+        return new Promise((resolve, reject) => {
+            if(user == null) {
+                reject('Email Address is present: failed');
+            } else{
+                //validates if user is in database
+                console.log('Email Address is present: passed');
+                resolve(user);
+            }
+        });
+    }
+
+
+     function checkPassword(user){ 
+        return new Promise((resolve, reject) =>{
+            //the user password is compared with the database password
+            const authenticated = bcryptjs.compareSync(credentials.pass, user[0].password);
+            if(authenticated){
+                console.log('Password is a match: passed');
+                resolve(user);
+            } else{
+                reject('Password is a match: failed.');
+            }
+        });
+    }
+
+    function getCourseId(user){
+        return Courses.findByPk(req.params.id);
+    }
+
+    //function to check if the course.userid matchs the user's id
+    function checkCourseIDandUserID(courseAndUser){
+        return new Promise((resolve, reject) => {
+            if(courseAndUser[0].userId === courseAndUser[1][0].id){
+                console.log('User and Course ID match: passed');
+                resolve(courseAndUser[0]);
+            } else{
+                reject('User and Course Id match: failed');
+            }
+        });
+    }
+
+
+
+    checkEmailAndPasswordProvided
+    .then(()=>{return Users.findAll({
+            where: {
+                emailAddress: credentials.email
+            }
+        });
+    }).then((user)=>{return checkEmailInDatabase(user); })
+    .then((user)=>{return checkPassword(user); })
+    .then((user)=>{
+            let courseId = getCourseId(user); 
+            return Promise.all([courseId, user]);
+    }).then((courseAndUser)=>{return checkCourseIDandUserID(courseAndUser); })
+    .then((course)=>{
+        course.destroy();
+        return res.status(204).json({ message: '' });
+    }).catch((err)=>{
+        //err = 'There was an error processing your request.';
+        console.warn(err);
+        return res.status(401).json({ message: 'Access Denied' });
+    });
+
+});
+
+
 module.exports = router;
+
+
+
+        // course.destroy();
+        //return res.status(204).json({ message: '' });
