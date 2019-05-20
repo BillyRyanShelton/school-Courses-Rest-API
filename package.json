@@ -7,12 +7,15 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon /.app.js",
+    "start": "node /.app.js",
     "seed": "cross-env DB_ENABLE_LOGGING=true node './seed'"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^1.19.0"
+  },
   "dependencies": {
     "atob": "^2.1.2",
     "bcryptjs": "^2.4.3",
