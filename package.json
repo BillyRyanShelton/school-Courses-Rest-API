@@ -4,7 +4,6 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "prepublish": "install",
     "start": "nodemon /.app.js",
     "seed": "cross-env DB_ENABLE_LOGGING=true node './seed'"
   },
