@@ -13,9 +13,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "nodemon": "^1.19.0"
-  },
   "dependencies": {
     "atob": "^2.1.2",
     "bcryptjs": "^2.4.3",
