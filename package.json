@@ -6,8 +6,7 @@
   "scripts": {
     "prepublish": "npm install",
     "start":"npm start",
-    "seed": "cross-env DB_ENABLE_LOGGING=true node './seed'",
-
+    "seed": "cross-env DB_ENABLE_LOGGING=true node './seed'"
   },
   "keywords": [],
   "author": "",
