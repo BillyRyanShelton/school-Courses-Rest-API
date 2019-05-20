@@ -185,14 +185,14 @@ router.put('/courses/:id', [
             console.log('Email Address and Password are present: passed');
             resolve();
         } else{
-            reject('The Email Address/Password were not provided.');
+            reject('Email Address and Password are present: failed.');
         }
     });
 
     function checkEmailInDatabase(user) { 
         return new Promise((resolve, reject) => {
             if(user == null) {
-                reject('The Email Address was not found.');
+                reject('Email Address is present: failed');
             } else{
                 //validates if user is in database
                 console.log('Email Address is present: passed');
@@ -208,14 +208,28 @@ router.put('/courses/:id', [
             const authenticated = bcryptjs.compareSync(credentials.pass, user[0].password);
             if(authenticated){
                 console.log('Password is a match: passed');
-                resolve();
+                resolve(user);
             } else{
-                reject('The Password is invalid.');
+                reject('Password is a match: failed.');
             }
         });
     }
 
+    function getCourseId(){
+        return Courses.findByPk(req.params.id);
+    }
 
+    //function to check if the course.userid matchs the user's id
+    function checkCourseIDandUserID(courseAndUser){
+        return new Promise((resolve, reject) => {
+            if(courseAndUser[0].userId === courseAndUser[1][0].id){
+                console.log('User and Course ID match: passed');
+                resolve(courseAndUser[0]);
+            } else{
+                reject('User and Course Id match: failed');
+            }
+        });
+    }
 
     checkTitleAndDescription
     .then(()=>{return checkEmailAndPasswordProvided})
@@ -226,7 +240,11 @@ router.put('/courses/:id', [
         });
     }).then((user)=>{return checkEmailInDatabase(user); })
     .then((user)=>{return checkPassword(user); })
-    .then(()=>{return Courses.findByPk(req.params.id);  })
+    .then((user)=>{
+            let courseId = getCourseId(); 
+            return Promise.all([courseId, user]);
+    }).then((courseAndUser)=>{
+        return checkCourseIDandUserID(courseAndUser); })
     .then((course)=>{ 
         course.update(req.body);
         return res.status(204).json({ message: '' });
@@ -241,7 +259,7 @@ router.put('/courses/:id', [
 
 
 
-
+//delete's a user's course
 router.delete('/courses/:id', (req, res) => {
 
     //user credentials are acquired from auth header
@@ -282,7 +300,7 @@ router.delete('/courses/:id', (req, res) => {
         });
     }
 
-    function getCourseId(user){
+    function getCourseId(){
         return Courses.findByPk(req.params.id);
     }
 
@@ -309,7 +327,7 @@ router.delete('/courses/:id', (req, res) => {
     }).then((user)=>{return checkEmailInDatabase(user); })
     .then((user)=>{return checkPassword(user); })
     .then((user)=>{
-            let courseId = getCourseId(user); 
+            let courseId = getCourseId(); 
             return Promise.all([courseId, user]);
     }).then((courseAndUser)=>{return checkCourseIDandUserID(courseAndUser); })
     .then((course)=>{
@@ -325,8 +343,3 @@ router.delete('/courses/:id', (req, res) => {
 
 
 module.exports = router;
-
-
-
-        // course.destroy();
-        //return res.status(204).json({ message: '' });
