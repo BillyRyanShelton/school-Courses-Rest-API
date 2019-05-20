@@ -5,7 +5,6 @@
   "main": "app.js",
   "scripts": {
     "prepublish": "npm install",
-    // "start": "nodemon ./app.js",
     "start":"npm start",
     "seed": "cross-env DB_ENABLE_LOGGING=true node './seed'",
 
