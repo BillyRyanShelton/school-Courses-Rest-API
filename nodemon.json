@@ -6,7 +6,7 @@
   ],
   "verbose": true,
   "env": {
-    "NODE_ENV": "productions",
+    "NODE_ENV": "production",
     "DB_ENABLE_LOGGING": "false",
     "ENABLE_GLOBAL_ERROR_LOGGING": "false"
   },
