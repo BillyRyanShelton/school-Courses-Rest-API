@@ -37,7 +37,7 @@ const getCredentials = (req) => {
 //returns list of all courses
 router.get('/courses', (req, res) => {
     Courses.findAll().then((courses)=>{
-        res.json(prettyFormat({
+        res.json.stringify({
             courses
         });
     });
