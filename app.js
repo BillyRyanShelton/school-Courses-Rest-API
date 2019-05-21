@@ -15,7 +15,6 @@ const app = express();
 
 // Setup request body JSON parsing.
 app.use(express.json());
-app.use('json spaces', 2);
 
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
