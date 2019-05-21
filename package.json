@@ -1,13 +1,10 @@
 {
   "name": "fullstackjs-rest-api",
   "version": "1.0.0",
-    "engines": {
-    "node": "11.9.0"
-  },
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "node /.app.js",
+    "start": "nodemon /.app.js",
     "seed": "cross-env DB_ENABLE_LOGGING=true node './seed'"
   },
   "keywords": [],
