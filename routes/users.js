@@ -8,6 +8,7 @@ let sequelize = require("../models").sequelize;
 const { check, validationResult } = require('express-validator/check');
 const bcryptjs = require('bcryptjs');
 const atob = require('atob');
+const prettyFormat = require('pretty-format');
 
 
 //getCredentials returns the user's credentials from the authorization header
@@ -103,106 +104,6 @@ router.get('/users', (req, res) => {
 
 });
 
-// // Route that returns the current authenticated user.
-// router.get('/users', (req, res) => {
-  
-//     let message = null;
-
-//     //user credentials are acquired from auth header
-//     const credentials = getCredentials(req);
-
-//   if (credentials) {
-//     //the email address is searched in the database
-//     Users.findAll({
-//         where: {
-//             emailAddress: credentials.email
-//         }
-//     }).then((user)=>{
-//         const authenticated = bcryptjs
-//         .compareSync(credentials.pass, user[0].password);
-
-//         if (authenticated) {
-//             console.log(`Authentication successful for username: ${user[0].username}`);
-//              res.json({
-//                 firstName: user[0].firstName,
-//                 lastName: user[0].lastName,
-//                 emailAddress: user[0].emailAddress,
-//                 id: user[0].id,
-//                 password: credentials.pass,
-//             });
-//         } else {
-//         throw message = `Authentication failure for username: ${user[0].username}`;
-//         }
-//     }).catch((err)=>{
-//         err = 'There was an error processing your request.';
-//         console.warn(err);
-//         res.status(401).json({ message: 'Access Denied' });
-
-//     });
-
-//   }else {
-//     message = 'Auth header not found';
-//   }
-
-//   if (message) {
-//     console.warn(message);
-//     res.status(401).json({ message: 'Access Denied' });
-//   }
-// });
-
-
-// // Route that creates a new user.
-// router.post('/users', [
-//   check('firstName')
-//     .exists({ checkNull: true, checkFalsy: true })
-//     .withMessage('Please provide a value for "first name"'),
-//   check('lastName')
-//     .exists({ checkNull: true, checkFalsy: true })
-//     .withMessage('Please provide a value for "last name"'),
-//   check('emailAddress')
-//     .exists({ checkNull: true, checkFalsy: true })
-//     .withMessage('Please provide a value for "email address"'),
-//   check('password')
-//     .exists({ checkNull: true, checkFalsy: true })
-//     .withMessage('Please provide a value for "password"'),
-// ],(req, res) => {
-//      // Attempt to get the validation result from the Request object.
-//     const errors = validationResult(req);    
-
-//     //if validation errors
-//     if (!errors.isEmpty()) {
-//     // Use the Array `map()` method to get a list of error messages.
-//     const errorMessages = errors.array().map(error => error.msg);
-
-//     // Return the validation errors to the client.
-//     return res.status(400).json({ errors: errorMessages });
-//   }
-
-//   let newUser = req.body;
-
-//   Users.findAll({
-//         where: {
-//             emailAddress: newUser.emailAddress
-//         }
-//     }).then((user)=>{
-//       //if the user info is already in the system
-//         if(user[0]) {
-//              res.status(401).json({ message: 'User already exists in the system.' });
-//         }  //if the user's info is not in the system it is added 
-//         else{
-//             // Hash the new user's password.
-//           newUser.password = bcryptjs.hashSync(newUser.password);
-//           Users.build({
-//               firstName: newUser.firstName,
-//               lastName: newUser.lastName,
-//               emailAddress: newUser.emailAddress,
-//               password: newUser.password
-//           }).save()
-//           res.redirect(201, '/');
-//         }
-//     });
-
-// });
 
 
 

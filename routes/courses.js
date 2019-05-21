@@ -8,6 +8,7 @@ let sequelize = require("../models").sequelize;
 const { check, validationResult } = require('express-validator/check');
 const bcryptjs = require('bcryptjs');
 const atob = require('atob');
+const prettyFormat = require('pretty-format');
 
 //getCredentials returns the user's credentials from the authorization header
 const getCredentials = (req) => {
@@ -36,7 +37,7 @@ const getCredentials = (req) => {
 //returns list of all courses
 router.get('/courses', (req, res) => {
     Courses.findAll().then((courses)=>{
-        res.json({
+        res.json(prettyFormat({
             courses
         });
     });
