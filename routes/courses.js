@@ -91,14 +91,14 @@ router.post('/courses', [
             console.log('Email Address and Password are present: passed');
             resolve();
         } else{
-            reject('The Email Address/Password were not provided.');
+            reject(Error('The Email Address/Password were not provided.'));
         }
     });
 
     function checkEmailInDatabase(user) { 
         return new Promise((resolve, reject) => {
             if(user == null) {
-                reject('The Email Address was not found.');
+                reject(Error('The Email Address was not found.'));
             } else{
                 //validates if user is in database
                 console.log('Email Address is present: passed');
@@ -116,7 +116,7 @@ router.post('/courses', [
                 console.log('Password is a match: passed');
                 resolve(user);
             } else{
-                reject('The Password is invalid.');
+                reject(Error('The Password is invalid.'));
             }
         });
     }
@@ -144,7 +144,7 @@ router.post('/courses', [
     .catch((err)=>{
         //err = 'There was an error processing your request.';
         console.warn(err);
-        return res.status(401).json({ message: 'Access Denied' });
+        return res.status(401).json({  error: err.message });
     });
 
 });
@@ -186,14 +186,14 @@ router.put('/courses/:id', [
             console.log('Email Address and Password are present: passed');
             resolve();
         } else{
-            reject('Email Address and Password are present: failed.');
+            reject(Error('Email Address and Password are present: failed.'));
         }
     });
 
     function checkEmailInDatabase(user) { 
         return new Promise((resolve, reject) => {
             if(user == null) {
-                reject('Email Address is present: failed');
+                reject(Error('Email Address is present: failed'));
             } else{
                 //validates if user is in database
                 console.log('Email Address is present: passed');
@@ -211,7 +211,7 @@ router.put('/courses/:id', [
                 console.log('Password is a match: passed');
                 resolve(user);
             } else{
-                reject('Password is a match: failed.');
+                reject(Error('Password is a match: failed.'));
             }
         });
     }
@@ -227,7 +227,7 @@ router.put('/courses/:id', [
                 console.log('User and Course ID match: passed');
                 resolve(courseAndUser[0]);
             } else{
-                reject('User and Course Id match: failed');
+                reject(Error('User and Course Id match: failed'));
             }
         });
     }
@@ -253,7 +253,7 @@ router.put('/courses/:id', [
     .catch((err)=>{
         //err = 'There was an error processing your request.';
         console.warn(err);
-        return res.status(401).json({ message: 'Access Denied' });
+        return res.status(401).json({  error: err.message });
     });
 
 });
@@ -271,14 +271,14 @@ router.delete('/courses/:id', (req, res) => {
             console.log('Email Address and Password are present: passed');
             resolve();
         } else{
-            reject('Email Address and Password are present: failed.');
+            reject(Error('Email Address and Password are present: failed.'));
         }
     });
 
     function checkEmailInDatabase(user) { 
         return new Promise((resolve, reject) => {
             if(user == null) {
-                reject('Email Address is present: failed');
+                reject(Error('Email Address is present: failed'));
             } else{
                 //validates if user is in database
                 console.log('Email Address is present: passed');
@@ -296,7 +296,7 @@ router.delete('/courses/:id', (req, res) => {
                 console.log('Password is a match: passed');
                 resolve(user);
             } else{
-                reject('Password is a match: failed.');
+                reject(Error('Password is a match: failed.'));
             }
         });
     }
@@ -312,7 +312,7 @@ router.delete('/courses/:id', (req, res) => {
                 console.log('User and Course ID match: passed');
                 resolve(courseAndUser[0]);
             } else{
-                reject('User and Course Id match: failed');
+                reject(Error('User and Course Id match: failed'));
             }
         });
     }
@@ -337,7 +337,7 @@ router.delete('/courses/:id', (req, res) => {
     }).catch((err)=>{
         //err = 'There was an error processing your request.';
         console.warn(err);
-        return res.status(401).json({ message: 'Access Denied' });
+        return res.status(401).json({  error: err.message });
     });
 
 });

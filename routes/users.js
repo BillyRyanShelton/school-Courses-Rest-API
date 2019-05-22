@@ -45,7 +45,7 @@ router.get('/users', (req, res) => {
             console.log('Email Address and Password are present: passed');
             resolve();
         } else{
-            reject('The Email Address/Password were not provided.');
+            reject(Error('The Email Address/Password were not provided.'));
         }
   });
 
@@ -53,7 +53,7 @@ router.get('/users', (req, res) => {
   function checkEmailInDatabase(user) { 
       return new Promise((resolve, reject) => {
           if(user == null) {
-              reject('The Email Address was not found.');
+              reject(Error('The Email Address was not found.'));
           } else{
               //validates if user is in database
               console.log('Email Address is present: passed');
@@ -71,7 +71,7 @@ router.get('/users', (req, res) => {
               console.log('Password is a match: passed');
               resolve(user);
           } else{
-              reject('The Password is invalid.');
+              reject(Error('The Password is invalid.'));
           }
       });
   }
@@ -98,7 +98,7 @@ router.get('/users', (req, res) => {
   .catch((err)=>{
       //err = 'There was an error processing your request.';
       console.warn(err);
-      return res.status(401).json({ message: 'Access Denied' });
+      return res.status(401).json({ message: err.message});
   });
 
 
@@ -142,7 +142,7 @@ router.post('/users', [
     return new Promise((resolve, reject) =>{
       let newUser = req.body;
       if(user[0]) {
-        reject('User already exists in the system.');
+        reject(Error('User already exists in the system.'));
            // res.status(401).json({ message: 'User already exists in the system.' });
       }  //if the user's info is not in the system it is added 
       else{
@@ -171,7 +171,7 @@ router.post('/users', [
     .catch((err)=>{
         //err = 'There was an error processing your request.';
         console.warn(err);
-        return res.status(401).json({ message: 'Access Denied' });
+        return res.status(401).json({  message: err.message });
     });
 
 });
