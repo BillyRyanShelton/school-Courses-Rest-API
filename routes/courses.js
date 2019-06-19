@@ -36,7 +36,16 @@ const getCredentials = (req) => {
 
 //returns list of all courses
 router.get('/courses', (req, res) => {
-    Courses.findAll().then((courses)=>{
+    Courses.findAll({
+        include: [
+        {
+          model: Users,
+
+          //Only send required attributes
+          attributes: ["firstName", "lastName"]
+        }
+        ]
+    }).then((courses)=>{
         res.json({
             courses
         });
