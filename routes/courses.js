@@ -38,12 +38,12 @@ const getCredentials = (req) => {
 router.get('/courses', (req, res) => {
     Courses.findAll({
         include: [
-        {
-          model: Users,
+            {
+              model: Users,
 
-          //Only send required attributes
-          attributes: ["firstName", "lastName"]
-        }
+              //Only send required attributes
+              attributes: ["firstName", "lastName"]
+            }
         ]
     }).then((courses)=>{
         res.json({
@@ -54,7 +54,20 @@ router.get('/courses', (req, res) => {
 
 //returns courses by id
 router.get('/courses/:id', (req, res, next) => {
-    Courses.findByPk(req.params.id).then((course) => {
+    Courses.findOne({
+        where:{
+            id:req.params.id
+        },
+        include: [
+            {
+              model: Users,
+
+              //Only send required attributes
+              attributes: ["firstName", "lastName"]
+            }
+        ]
+    }).
+    then((course) => {
         //if it is found then is is returned
         if(course) {
             res.json({
