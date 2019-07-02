@@ -111,16 +111,16 @@ router.get('/users', (req, res) => {
 router.post('/users', [
   check('firstName')
     .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "first name"'),
+    .withMessage('Please provide a value for first name'),
   check('lastName')
     .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "last name"'),
+    .withMessage('Please provide a value for last name'),
   check('emailAddress')
     .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "email address"'),
+    .withMessage('Please provide a value for email address'),
   check('password')
     .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "password"'),
+    .withMessage('Please provide a value for password'),
 ],(req, res) => {
   // Attempt to get the validation result from the Request object.
   const userErrors = validationResult(req);    
@@ -131,7 +131,7 @@ router.post('/users', [
   const checkFirstLastEmailAndPassword = new Promise((resolve, reject) => {
       if(!userErrors.isEmpty()) {
           const userErrorMessages = userErrors.array().map(error => error.msg);
-          reject(userErrorMessages);
+          reject(Error(userErrorMessages));
       } else {
           console.log('First Name, Last Name, Email, Password Present: passed');
           resolve();
