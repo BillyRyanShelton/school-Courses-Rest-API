@@ -42,7 +42,7 @@ router.get('/courses', (req, res) => {
               model: Users,
 
               //Only send required attributes
-              attributes: ["firstName", "lastName"]
+              attributes: ["firstName", "lastName","emailAddress"]
             }
         ]
     }).then((courses)=>{
@@ -63,7 +63,7 @@ router.get('/courses/:id', (req, res, next) => {
               model: Users,
 
               //Only send required attributes
-              attributes: ["firstName", "lastName"]
+              attributes: ["firstName", "lastName","emailAddress"]
             }
         ]
     }).
