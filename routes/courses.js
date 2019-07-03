@@ -85,10 +85,10 @@ router.get('/courses/:id', (req, res, next) => {
 router.post('/courses', [
   check('title')
     .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "title".'),
+    .withMessage('Please provide a value for title.'),
   check('description')
     .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "description"'),
+    .withMessage('Please provide a value for description'),
 ], (req, res) => {
      // Attempt to get the validation result from the Request object.
     const courseErrors = validationResult(req);    
@@ -101,7 +101,7 @@ router.post('/courses', [
     const checkTitleAndDescription = new Promise((resolve, reject) => {
         if(!courseErrors.isEmpty()) {
             const courseErrorMessages = courseErrors.array().map(error => error.msg);
-            reject(courseErrorMessages);
+            reject(Error(courseErrorMessages));
         } else {
             console.log('Title and Description: passed');
             resolve();
@@ -176,10 +176,10 @@ router.post('/courses', [
 router.put('/courses/:id', [
   check('title')
     .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "title".'),
+    .withMessage('Please provide a value for title.'),
   check('description')
     .exists({ checkNull: true, checkFalsy: true })
-    .withMessage('Please provide a value for "description"'),
+    .withMessage('Please provide a value for description'),
 ], (req, res) => {
 
 
@@ -196,7 +196,7 @@ router.put('/courses/:id', [
     const checkTitleAndDescription = new Promise((resolve, reject) => {
         if(!courseErrors.isEmpty()) {
             const courseErrorMessages = courseErrors.array().map(error => error.msg);
-            reject(courseErrorMessages);
+            reject(Error(courseErrorMessages));
         } else {
             console.log('Title and Description: passed');
             resolve();
