@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const sequelize = require('./models').sequelize;
 const users = require('./routes/users');
 const courses = require('./routes/courses');
+const cors = require('cors');
 
 // // variable to enable global error logging
 // const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
@@ -20,6 +21,9 @@ app.set('json spaces', 2);
 
 // setup morgan which gives us http request logging
 app.use(morgan('dev'));
+
+//cross-orgin resource sharing --> another local application is able to use this api
+app.use(cors());
 
 //A friendly greeting for the root route
 app.get('/', (req, res) => {
