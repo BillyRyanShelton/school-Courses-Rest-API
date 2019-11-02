@@ -24,7 +24,7 @@
     "nodemon": "^1.19.0",
     "pretty-format": "^24.8.0",
     "promise.prototype.finally": "^3.1.0",
-    "sequelize": "^5.8.5",
+    "sequelize": "^5.15.1",
     "sqlite3": "^4.0.2"
   }
 }
